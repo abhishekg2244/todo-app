@@ -51,18 +51,18 @@ jobs:
 # 3) Deploy JOB — Deploytodev
 # --------------------------------------------------------- 
   Deploytodev:
-    name: deploytodev
-    needs: CI
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Helm Deploy to Dev
-        run: |
-          helm repo add todo-helm https://github.com/abhishekg2244/helm-charts.git
-          helm pull todo-helm/common-todo-chart --untar
-      
-          helm upgrade todo-app ./common-todo-chart \
-            --install \
-            --namespace todo-dev \
-            -f Helm/values-dev.yaml \
-            --set image.tag=${{ github.run_number }}
+      name: deploytodev
+      needs: CI
+      runs-on: ubuntu-latest
+  
+      steps:
+        - name: Helm Deploy to Dev
+          run: |
+            helm repo add todo-helm https://github.com/abhishekg2244/helm-charts.git
+            helm pull todo-helm/common-todo-chart --untar
+        
+            helm upgrade todo-app ./common-todo-chart \
+              --install \
+              --namespace todo-dev \
+              -f Helm/values-dev.yaml \
+              --set image.tag=${{ github.run_number }}
