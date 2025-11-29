@@ -1,0 +1,9 @@
+replicaCount: 1
+image:
+  repository: ghcr.io/your-org/todo-app
+  tag: dev-${{GITHUB_RUN_NUMBER}}   # pipeline will replace or set tag via --set or env
+service:
+  type: ClusterIP
+  port: 80
+ingress:
+  enabled: false
