@@ -53,7 +53,7 @@ jobs:
   Deploytodev:
     name: Deploy to Dev
     needs: CD
-    runs-on: selg-hosted
+    runs-on: self-hosted
 
     steps:
           - name: Checkout repo
