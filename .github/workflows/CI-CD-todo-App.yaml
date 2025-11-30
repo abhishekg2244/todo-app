@@ -109,7 +109,7 @@ jobs:
           run: helm pull oci://ghcr.io/abhishekg2244/charts/common-todo-chart --version 0.1.0 --untar
 
         - name: Deploy using Helm
-          run: helm upgrade todo-app ./common-todo-chart --install --namespace todo-test -f ./Helm/values-test.yaml --set image.tag=latest  
+          run: helm upgrade todo-app ./common-todo-chart --install --namespace todo-test -f ./Helm/values-qa.yaml --set image.tag=latest  
 
 # ---------------------------------------------------------
 # 3) DeployPRODJOB — DeploytoProd
