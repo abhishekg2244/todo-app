@@ -127,7 +127,7 @@ jobs:
 # 3) DeployTESTJOB — DeploytoTest
 # --------------------------------------------------------- 
   DeploytoTest:
-      if: ${{ github.event.inputs.run_deploy_dev == 'true' }}
+      if: ${{ github.event.inputs.run_deploy_test == 'true' }}
       name: Deploy to test
       needs: Deploytodev
       runs-on: self-hosted
@@ -149,7 +149,7 @@ jobs:
 # 3) DeployPRODJOB — DeploytoProd
 # --------------------------------------------------------- 
   DeploytoProd:
-      if: ${{ github.event.input.run_deploy_prod == "true' }}
+      if: ${{ github.event.input.run_deploy_prod == 'true' }}
       name: Deploy to Prod
       needs: DeploytoTest
       runs-on: self-hosted
