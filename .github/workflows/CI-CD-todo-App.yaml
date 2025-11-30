@@ -95,9 +95,9 @@ jobs:
 # 3) DeployDEVJOB — Deploytodev
 # --------------------------------------------------------- 
   Deploytodev:
-    if: ${{ github.event.inputs.run_deploy_dev == 'true' && github.event.inputs.run_cd == 'true' }}
+    if: ${{ github.event.inputs.run_deploy_dev == 'true' }}
     name: Deploy to Dev
-    # needs: CD
+    needs: CD
     runs-on: self-hosted
 
     steps:
@@ -127,10 +127,10 @@ jobs:
 # 3) DeployTESTJOB — DeploytoTest
 # --------------------------------------------------------- 
   DeploytoTest:
-      if: ${{ github.event.inputs.run_deploy_test == 'true' && github.event.inputs.run_cd == 'true'  }}
+      if: ${{ github.event.inputs.run_deploy_test == 'true }}
       name: Deploy to test
       # needs: Deploytodev
-      # needs: CD
+      needs: CD
       runs-on: self-hosted
   
       steps:
@@ -150,9 +150,9 @@ jobs:
 # 3) DeployPRODJOB — DeploytoProd
 # --------------------------------------------------------- 
   DeploytoProd:
-      if: ${{ github.event.input.run_deploy_prod == 'true' && github.event.inputs.run_cd == 'true'  }}
+      if: ${{ github.event.input.run_deploy_prod == 'true' && }}
       name: Deploy to Prod
-      # needs: CD
+      needs: CD
       # needs: DeploytoTest
       runs-on: self-hosted
   
