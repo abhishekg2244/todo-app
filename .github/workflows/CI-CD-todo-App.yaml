@@ -150,7 +150,7 @@ jobs:
 # 3) DeployPRODJOB — DeploytoProd
 # --------------------------------------------------------- 
   DeploytoProd:
-      if: ${{ github.event.input.run_deploy_prod == 'true' && }}
+      if: ${{ github.event.input.run_deploy_prod == 'true' }}
       name: Deploy to Prod
       needs: CD
       # needs: DeploytoTest
