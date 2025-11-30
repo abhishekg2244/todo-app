@@ -64,20 +64,31 @@ jobs:
     
           - name: Helm Login GHCR
             run: echo "${{ secrets.GHCR_TOKEN }}" | helm registry login ghcr.io --username ${{ github.actor }} --password-stdin
-      
+
+      #-------------  it for SH not for Powershell -------------------#
+          # - name: Pull Helm Chart from OCI
+          #   run: |
+          #     helm pull oci://ghcr.io/abhishekg2244/charts/common-todo-chart \
+          #     --version 0.1.0 \
+          #     --untar
+    #-------------  it is for Powershell -----------------------------#
+    
           - name: Pull Helm Chart from OCI
-            run: |
-              helm pull oci://ghcr.io/abhishekg2244/charts/common-todo-chart \
-              --version 0.1.0 \
-              --untar
-      
+            run: helm pull oci://ghcr.io/abhishekg2244/charts/common-todo-chart --version 0.1.0 --untar
+
+    #------------it for SH ---------------------#  
+          # - name: Deploy using Helm
+          #   run: |
+          #     helm upgrade todo-app ./common-todo-chart \
+          #     --install \
+          #     --namespace todo-dev \
+          #     -f Helm/values-dev.yaml \
+          #     --set image.tag=latest
+
+    #------------it is for powerhell ----------------#
           - name: Deploy using Helm
-            run: |
-              helm upgrade todo-app ./common-todo-chart \
-              --install \
-              --namespace todo-dev \
-              -f Helm/values-dev.yaml \
-              --set image.tag=latest
+            run: helm upgrade todo-app ./common-todo-chart --install --namespace todo-dev -f Helm/values-dev.yaml --set image.tag=latest
+
         
       # steps:
       #   - name: Helm Deploy to Dev
