@@ -87,7 +87,7 @@ jobs:
 
     #------------it is for powerhell ----------------#
           - name: Deploy using Helm
-            run: helm upgrade todo-app ./common-todo-chart --install --namespace todo-dev -f Helm/values-dev.yaml --set image.tag=latest
+            run: helm upgrade todo-app ./common-todo-chart --install --namespace todo-dev -f ./Helm/values-dev.yaml --set image.tag=latest
 
         
       # steps:
