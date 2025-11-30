@@ -4,6 +4,8 @@ image:
   repository: ghcr.io/abhishekg2244/frontend
   tag: ""
   pullPolicy: IfNotPresent
+  
+imagePullSecret: ghcr-secret
 
 service:
   type: ClusterIP
