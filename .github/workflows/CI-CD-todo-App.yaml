@@ -51,10 +51,34 @@ jobs:
 # 3) Deploy JOB — Deploytodev
 # --------------------------------------------------------- 
   Deploytodev:
-      name: deploytodev
-      needs: CI
-      runs-on: ubuntu-latest
-  
+    name: Deploy to Dev
+    needs: CD
+    runs-on: selg-hosted
+
+    steps:
+          - name: Checkout repo
+            uses: actions/checkout@v4
+      
+          # - name: Setup Helm
+          #   uses: azure/setup-helm@v4.2.0
+    
+          - name: Helm Login GHCR
+            run: echo "${{ secrets.GHCR_TOKEN }}" | helm registry login ghcr.io --username ${{ github.actor }} --password-stdin
+      
+          - name: Pull Helm Chart from OCI
+            run: |
+              helm pull oci://ghcr.io/abhishekg2244/charts/common-todo-chart \
+              --version 0.1.0 \
+              --untar
+      
+          - name: Deploy using Helm
+            run: |
+              helm upgrade todo-app ./common-todo-chart \
+              --install \
+              --namespace todo-dev \
+              -f Helm/values-dev.yaml \
+              --set image.tag=latest
+        
       # steps:
       #   - name: Helm Deploy to Dev
       #     run: |
@@ -67,15 +91,16 @@ jobs:
       #         -f Helm/values-dev.yaml \
       #         --set image.tag=${{ github.run_number }}
 
-      steps:
-        - name: Clone Helm Chart Repository
-          run: git clone https://github.com/abhishekg2244/helm-charts.git
+      # steps:
+      #   - name: Clone Helm Chart Repository
+      #     run: git clone https://github.com/abhishekg2244/helm-charts.git
           
-        - name: Helm Deploy
-          run: |
-              helm upgrade todo-app ./helm-charts/common-todo-chart \
-                --install \
-                --namespace todo-dev \
-                -f Helm/values-dev.yaml \
-                --set image.tag=${{ github.run_number }}
+      #   - name: Helm Deploy
+      #     run: |
+      #         helm upgrade todo-app ./helm-charts/common-todo-chart \
+      #           --install \
+      #           --namespace todo-dev \
+      #           -f Helm/values-dev.yaml \
+      #           --set image.tag=${{ github.run_number }}
+    
 
