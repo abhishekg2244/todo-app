@@ -2,6 +2,9 @@ replicaCount: 3
 image:
   repository: ghcr.io/your-org/todo-app
   tag:  # pipeline will set image tag using commit SHA
+
+imagePullSecret: ghcr-secret
+
 service:
   type: LoadBalancer
   port: 80
