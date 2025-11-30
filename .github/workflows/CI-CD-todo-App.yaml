@@ -127,7 +127,7 @@ jobs:
 # 3) DeployTESTJOB — DeploytoTest
 # --------------------------------------------------------- 
   DeploytoTest:
-      if: ${{ github.event.inputs.run_deploy_test == 'true }}
+      if: ${{ github.event.inputs.run_deploy_test == 'true' }}
       name: Deploy to test
       # needs: Deploytodev
       needs: CD
