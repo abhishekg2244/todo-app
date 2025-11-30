@@ -1,6 +1,18 @@
 name: CI-CD-todo-app
 on: 
   workflow_dispatch:
+    inputs:
+      stage:
+        description: "Select pipeline stage to run"
+        required: true
+        type: choice
+        options:
+          - CI
+          - CD
+          - Deploytodev
+          - DeploytoTest
+          - DeploytoProd
+          
 permissions: 
    contents: read
    packages: write
@@ -97,8 +109,28 @@ jobs:
           run: helm pull oci://ghcr.io/abhishekg2244/charts/common-todo-chart --version 0.1.0 --untar
 
         - name: Deploy using Helm
-          run: helm upgrade todo-app ./common-todo-chart --install --namespace todo-dev -f ./Helm/values-test.yaml --set image.tag=latest  
+          run: helm upgrade todo-app ./common-todo-chart --install --namespace todo-test -f ./Helm/values-test.yaml --set image.tag=latest  
 
+# ---------------------------------------------------------
+# 3) DeployPRODJOB — DeploytoProd
+# --------------------------------------------------------- 
+  DeploytoProd:
+      name: Deploy to Prod
+      needs: DeploytoTest
+      runs-on: self-hosted
+  
+      steps:
+        - name: Checkout repo
+          uses: actions/checkout@v4
+   
+        - name: Helm Login GHCR
+          run: echo "${{ secrets.GHCR_TOKEN }}" | helm registry login ghcr.io --username ${{ github.actor }} --password-stdin
+    
+        - name: Pull Helm Chart from OCI
+          run: helm pull oci://ghcr.io/abhishekg2244/charts/common-todo-chart --version 0.1.0 --untar
+
+        - name: Deploy using Helm
+          run: helm upgrade todo-app ./common-todo-chart --install --namespace prod-test -f ./Helm/values-prod.yaml --set image.tag=latest  
 
 
  
