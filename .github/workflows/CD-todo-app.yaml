@@ -1,0 +1,145 @@
+name: CD-todo-app
+on: 
+  workflow_dispatch:
+    inputs:
+      run_ci:
+        description: "Run CI Stage"
+        required: true
+        type: boolean
+        default: false
+
+      run_cd:
+        description: "Run CD Stage"
+        required: true
+        type: boolean
+        default: false
+
+      run_deploy_dev:
+        description: "Deploy to dev"
+        required: true
+        type: boolean
+        default: false
+
+      run_deploy_test:
+        description: "Deploy to test"
+        required: true
+        type: boolean
+        default: false
+        
+      run_deploy_prod:
+        description: "Deploy to prod"
+        required: true
+        type: boolean
+        default: false
+          
+permissions: 
+   contents: write
+   packages: write
+
+
+jobs:
+
+  # -------------------------------
+  # 1) CI: Test + Lint + Sonar
+  # -------------------------------
+  CI:
+    if: ${{ github.event.inputs.run_ci == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+
+  # -------------------------------
+  # 2) CD: Docker Build + Push
+  # -------------------------------
+  CD:
+    if: ${{ github.event.inputs.run_cd == 'true' }}
+    needs: CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.HELMTOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build & Push Image
+        run: |
+          docker build -t frontend:latest .
+          docker tag frontend:latest ghcr.io/abhishekg2244/frontend:latest
+          docker push ghcr.io/abhishekg2244/frontend:latest
+
+
+  # -------------------------------
+  # 3) Deploy to DEV (values update)
+  # -------------------------------
+  Deploytodev:
+    if: ${{ github.event.inputs.run_deploy_dev == 'true' }}
+    needs: CD
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update image tag in values-dev.yaml
+        run: |
+          sed -i "s/tag:.*/tag: latest/" Helm/values-dev.yaml
+
+      - name: Commit & Push change
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add Helm/values-dev.yaml
+          git commit -m "Update image tag for DEV to latest"
+          git push
+
+
+  # -------------------------------
+  # 4) Deploy to TEST
+  # -------------------------------
+  DeploytoTest:
+    if: ${{ github.event.inputs.run_deploy_test == 'true' }}
+    needs: CD
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update tag test
+        run: |
+          sed -i "s/tag:.*/tag: latest/" Helm/values-qa.yaml
+
+      - name: Commit & Push
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add Helm/values-qa.yaml
+          git commit -m "Update image tag for TEST to latest"
+          git push
+
+
+  # -------------------------------
+  # 5) Deploy to PROD
+  # -------------------------------
+  DeploytoProd:
+    if: ${{ github.event.inputs.run_deploy_prod == 'true' }}
+    needs: CD
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update tag prod
+        run: |
+          sed -i "s/tag:.*/tag: latest/" Helm/values-prod.yaml
+
+      - name: Commit & Push
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add Helm/values-prod.yaml
+          git commit -m "Update image tag for PROD to latest"
+          git push
